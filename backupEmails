@@ -1,0 +1,37 @@
+Attribute VB_Name = "modGetOutlookItems"
+'thanks to Wise Owl Tutorials https://www.youtube.com/watch?v=BcvCpXZUNNc&list=PLNIs-AWhQzcleylKSN4MS-tJloReq0XcK&index=7
+Sub getRootFolder()
+    Dim ol As Outlook.Application
+    Dim ns As Outlook.NameSpace
+    Dim rootFolder As Outlook.Folder
+    
+    Set ol = New Outlook.Application
+    Set ns = ol.GetNamespace("MAPI")
+    Set rootFolder = ns.Folders(1) ' .("Bills")
+    
+    listItemsAndFolders rootFolder
+    Close
+End Sub
+
+Sub listItemsAndFolders(ParentFolder As Outlook.Folder)
+    Dim i As Object
+    Dim subFol As Outlook.Folder
+    
+    Close
+    Open Environ$("USERPROFILE") & "\Downloads\EmailArchive.txt" For Append As #1
+    
+    Print #1, ParentFolder.Name & " " & ParentFolder.FolderPath
+    
+    For Each i In ParentFolder.Items
+        DoEvents
+        Print #1, i.Subject & " " & i.Class & " " & i.CreationTime
+        Print #1, i.Body
+        'Stop
+    Next i
+    
+    For Each subFol In ParentFolder.Folders
+        listItemsAndFolders subFol
+        DoEvents
+        ' Stop
+    Next subFol
+End Sub
